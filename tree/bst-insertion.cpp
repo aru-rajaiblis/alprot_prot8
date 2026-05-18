@@ -2,43 +2,50 @@
 
 using namespace std;
 
+//Bahan pembentuk cabang tree
 struct BSTNode {
     int data;
-    BSTNode* kiri;
-    BSTNode* kanan;
+    BSTNode* left;
+    BSTNode* right;
 };
 
-//fungsi dasarnya bst
+//fungsi yang memasukkan angka ke tree
 BSTNode* Insertnode (BSTNode* root, int data){
+    //angka dimasukkan ke node yang kosong
     if (root == nullptr){
-        BSTNode* nodebaru = new BSTNode();
-        nodebaru->data = data;
-        nodebaru->kiri = nodebaru->kanan = nullptr;
-        return nodebaru;
+        BSTNode* newnode = new BSTNode();
+        newnode->data = data;
+        newnode->left = newnode->right = nullptr;
+        return newnode;
     }
-    if (data <= root->data){
-        root->kiri = Insertnode(root->kiri, data);
+
+    //aturan utama BST
+    if (data < root->data){
+        root->left = Insertnode(root->left, data);
     }
-    else{
-        root->kanan = Insertnode(root->kanan, data);
+    else if(data > root->data){
+        root->right = Insertnode(root->right, data);
     }
     return root;
 }
-   
+
+//fungsi yang cetak angka dari root->left->right
 void preorder(BSTNode* root) {
     if (root == nullptr) 
         return;
-
     cout << root->data << " ";
-    preorder(root->kiri);
-    preorder(root->kanan);
+    preorder(root->left);
+    preorder(root->right);
 }
 
 int main() {
-    BSTNode* root = nullptr;
-    int data[] = {4, 2, 7, 1, 3, 6};
+    BSTNode* root = nullptr; //inisialisasi kalau kosong
+    int data[] = {4, 7, 2, 3, 1, 6, 7};
     
-    for(int i = 0; i < 6; i++) {
+    //agar loop otomatis tanpa ubah manual
+    int n = sizeof(data) / sizeof(data[0]);
+    //loop memasukkan data array ke setiap node
+    for(int i = 0; i < n; i++) {
         root = Insertnode(root, data[i]);
     }
 

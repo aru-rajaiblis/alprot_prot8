@@ -1,12 +1,14 @@
 #include <iostream>
 using namespace std;
 
+//struktur node
 class Node {
 public:
     int data;
     Node *left;
     Node *right;
 
+    // Constructor untuk mempermudah pembuatan node baru
     Node(int d) {
         data = d;
         left = NULL;
@@ -14,6 +16,7 @@ public:
     }
 };
 
+// Fungsi untuk memasukkan angka ke tree (sesuai soal)
 Node* insert(Node* root, int data) {
     if (root == NULL) {
         return new Node(data);
@@ -28,6 +31,7 @@ Node* insert(Node* root, int data) {
     return root;
 }
 
+//fungsi yang cetak angka dari root->left->right
 void preOrder(Node* root) {
     if (root == NULL) return;
     
@@ -36,6 +40,7 @@ void preOrder(Node* root) {
     preOrder(root->right);
 }
 
+//Tempat input data
 int main() {
     Node* root = NULL;
     root = insert(root, 4);
