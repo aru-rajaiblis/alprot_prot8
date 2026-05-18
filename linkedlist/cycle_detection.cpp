@@ -4,26 +4,27 @@
 
 using namespace std;
 
+// blueprint pembuatan nodenya
 struct Node {
     int data;
     Node* next;
-    Node(int val) : data(val), next(nullptr) {}
+    Node(int val) : data(val), next(nullptr) {} // disetiap node berisi nilai, dan pointer menuju alamat selanjutnya
 };
 
-// Fungsi 1: Versi Original (Eksplisit nullptr)
+// Fungsi 1: Versi Original 
 bool has_cycle_original(Node* head) {
     if (head == nullptr) return false;
     Node* kurakura = head;
-    Node* kelinci = head;
+    Node* kelinci = head; // penunjuk 1 dan penunjuk 2 mulai di titik yang sama
     while (kelinci != nullptr && kelinci->next != nullptr) {
         kurakura = kurakura->next;
         kelinci = kelinci->next->next;
         if (kurakura == kelinci) return true;
-    }
+    } // proses pengecekan dilakukan selama kelinci (penunjuk 2) memiliki alamat, dan terdapat pointer alamat selanjutnya
     return false;
 }
 
-// Fungsi 2: Versi Optimized (Idiomatik/Implicit)
+// Fungsi 2: Versi Optimized (eiai)
 bool has_cycle_optimized(Node* head) {
     if (!head) return false;
     Node *slow = head, *fast = head;
@@ -52,7 +53,7 @@ int main() {
     
     // 2. Benchmark Versi Optimized
     auto start2 = chrono::high_resolution_clock::now();
-    for(int i = 0; i < 100; i++) has_cycle_optimized(head);
+    for(int i = 0; i < 100; i++) has_cycle_optimized(head); // Jalankan 100x untuk rata-rata
     auto end2 = chrono::high_resolution_clock::now();
     auto duration2 = chrono::duration_cast<chrono::microseconds>(end2 - start2).count();
 

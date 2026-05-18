@@ -15,25 +15,25 @@ struct Node {
     }
 };
 
-// fungsi original (Depth first searcjj)
+// fungsi original 
 
 unordered_map<Node*, Node*> visitedDFS;
 Node* cloneGraphDFS(Node* node) {
-    if (!node) return nullptr;
+    if (!node) return nullptr; // basecase 1
     if (visitedDFS.find(node) != visitedDFS.end()) 
-        return visitedDFS[node];
+        return visitedDFS[node]; // basecase 2
 
-    Node* copy = new Node(node->val);
-    visitedDFS[node] = copy;
+    Node* copy = new Node(node->val); // kalau lolos persyaratan if else
+
+    visitedDFS[node] = copy; 
+
     for (Node* neighbor : node->neighbors) {
-        copy->neighbors.push_back(cloneGraphDFS(neighbor));
+        copy->neighbors.push_back(cloneGraphDFS(neighbor)); // melakukan perulangan fungsi (rekursif) di setiap tetangga pada nodes/vertex tersebut
     }
     return copy;
 }
 
-// --- ai ---
-
-// Fungsi yang udh dioptimasi oleh ai
+// Fungsi yang dipakai oleh ai
 
 Node* cloneGraphBFS(Node* node) {
     if (!node) return nullptr;
@@ -100,7 +100,7 @@ int main() {
     // TAHAP 1: Skenario Normal (Aman)
     runTestGantian(10000);
 
-    // TAHAP 2: Skenario Ekstrim (BFS pasti tampil, DFS mungkin crash)
+    // TAHAP 2: Skenario Ekstrim
     runTestGantian(500000); 
 
     return 0;
