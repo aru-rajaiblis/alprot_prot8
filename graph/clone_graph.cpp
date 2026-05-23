@@ -1,107 +1,92 @@
 #include <iostream>
-#include <vector>
 #include <unordered_map>
-#include <queue>
-#include <chrono>
-#include <numeric>
+#include <vector>
 
 using namespace std;
 
+// 1. FONDASI: Cetak Biru Struktur Node
 struct Node {
-    int val;
-    vector<Node*> neighbors;
-    Node(int _val) {
-        val = _val;
-    }
+  int val;
+  vector<Node *> neighbors;
+
+  // Constructor
+  Node(int _val) : val(_val) {}
 };
 
-// fungsi original 
+// BUKU CATATAN GLOBAL
+unordered_map<Node *, Node *> visitedDFS;
 
-unordered_map<Node*, Node*> visitedDFS;
-Node* cloneGraphDFS(Node* node) {
-    if (!node) return nullptr; // basecase 1
-    if (visitedDFS.find(node) != visitedDFS.end()) 
-        return visitedDFS[node]; // basecase 2
+// 2. FUNGSI CLONING (DFS)
+Node *cloneGraphDFS(Node *node) {
+  if (!node)
+    return nullptr;
 
-    Node* copy = new Node(node->val); // kalau lolos persyaratan if else
+  // Jika sudah pernah dikloning, kembalikan dari map
+  if (visitedDFS.find(node) != visitedDFS.end()) {
+    return visitedDFS[node];
+  }
 
-    visitedDFS[node] = copy; 
+  // Kloning fisik & registrasi
+  Node *copy = new Node(node->val);
+  visitedDFS[node] = copy;
 
-    for (Node* neighbor : node->neighbors) {
-        copy->neighbors.push_back(cloneGraphDFS(neighbor)); // melakukan perulangan fungsi (rekursif) di setiap tetangga pada nodes/vertex tersebut
-    }
-    return copy;
+  // Perulangan & penjahitan jalur
+  for (Node *neighbor : node->neighbors) {
+    copy->neighbors.push_back(cloneGraphDFS(neighbor));
+  }
+
+  return copy;
 }
 
-// Fungsi yang dipakai oleh ai
+// 3. FUNGSI PEMBANTU: Untuk mencetak Graph ke terminal (biar kelihatan
+// hasilnya)
+void printGraph(Node *node, unordered_map<Node *, bool> &visited) {
+  if (!node || visited[node])
+    return;
 
-Node* cloneGraphBFS(Node* node) {
-    if (!node) return nullptr;
-    unordered_map<Node*, Node*> copies;
-    queue<Node*> q;
+  visited[node] = true;
+  cout << "Node [" << node->val << "] berteman dengan: ";
+  for (Node *neighbor : node->neighbors) {
+    cout << neighbor->val << " ";
+  }
+  cout << endl;
 
-    copies[node] = new Node(node->val);
-    q.push(node);
-
-    while (!q.empty()) {
-        Node* curr = q.front();
-        q.pop();
-        for (Node* neighbor : curr->neighbors) {
-            if (copies.find(neighbor) == copies.end()) {
-                copies[neighbor] = new Node(neighbor->val);
-                q.push(neighbor);
-            }
-            copies[curr]->neighbors.push_back(copies[neighbor]);
-        }
-    }
-    return copies[node];
+  for (Node *neighbor : node->neighbors) {
+    printGraph(neighbor, visited);
+  }
 }
 
-// --- Persiapan Benchmark ---
-
-Node* createLargeGraph(int n) {
-    if (n <= 0) return nullptr;
-    vector<Node*> nodes;
-    for (int i = 1; i <= n; i++) nodes.push_back(new Node(i));
-    for (int i = 0; i < n - 1; i++) {
-        nodes[i]->neighbors.push_back(nodes[i+1]);
-        nodes[i+1]->neighbors.push_back(nodes[i]);
-    }
-    return nodes[0];
-}
-
-void runTestGantian(int numNodes) {
-    cout << "\n>>> TESTING DENGAN " << numNodes << " NODES <<<" << endl;
-    Node* original = createLargeGraph(numNodes);
-
-    // 1. Jalankan BFS 
-    cout << "Menjalankan BFS... " << flush; // flush agar teks muncul segera
-    auto s1 = chrono::high_resolution_clock::now();
-    cloneGraphBFS(original);
-    auto e1 = chrono::high_resolution_clock::now();
-    double bfsTime = chrono::duration<double, milli>(e1 - s1).count();
-    cout << "SELESAI!" << endl;
-    cout << "Hasil BFS : " << bfsTime << " ms" << endl;
-
-    // 2. Baru Jalankan DFS
-    cout << "Menjalankan DFS (Risiko Crash)... " << flush;
-    visitedDFS.clear();
-    auto s2 = chrono::high_resolution_clock::now();
-    cloneGraphDFS(original);
-    auto e2 = chrono::high_resolution_clock::now();
-    double dfsTime = chrono::duration<double, milli>(e2 - s2).count();
-    cout << "SELESAI!" << endl;
-    cout << "Hasil DFS : " << dfsTime << " ms" << endl;
-}
-
+// 4. MOTOR UTAMA
 int main() {
-    cout << "=== MEMULAI BENCHMARK  ===" << endl;
+  cout << "=== MEMBUAT GRAPH ASLI ===" << endl;
 
-    // TAHAP 1: Skenario Normal (Aman)
-    runTestGantian(10000);
+  // 1. Mendeklarasikan Node
+  Node *n1 = new Node(1);
+  Node *n2 = new Node(2);
+  Node *n3 = new Node(3);
 
-    // TAHAP 2: Skenario Ekstrim
-    runTestGantian(500000); 
+  // 2. Menghubungkan edges nya: 1 <-> 2 <-> 3
+  n1->neighbors.push_back(n2);
+  n2->neighbors.push_back(n1);
 
-    return 0;
+  n2->neighbors.push_back(n3);
+  n3->neighbors.push_back(n2);
+
+  // 3. Mencetak Graph Asli
+  unordered_map<Node *, bool> visitedPrint1;
+  printGraph(n1, visitedPrint1);
+
+  // 4. Proses Cloning
+  Node *clonedGraph = cloneGraphDFS(n1);
+
+  cout << "\n=== MEMERIKSA GRAPH HASIL KLONING ===" << endl;
+  unordered_map<Node *, bool> visitedPrint2;
+  printGraph(clonedGraph, visitedPrint2);
+
+  // Cek pembuktian alamat memori (Deep Copy)
+  cout << "\nPembuktian Alamat Memori (Harus Berbeda):" << endl;
+  cout << "Alamat Node 1 Asli   : " << n1 << endl;
+  cout << "Alamat Node 1 Kloning: " << clonedGraph << endl;
+
+  return 0;
 }
