@@ -1,0 +1,26 @@
+link soal:
+https://www.hackerrank.com/challenges/delete-duplicate-value-nodes-from-a-sorted-linked-list/problem?isFullScreen=true
+
+Potongan kode untuk solusinya
+
+SinglyLinkedListNode* removeDuplicates(SinglyLinkedListNode* llist) {
+    if (llist == nullptr) {
+        return llist;
+    }
+    
+    // Disamakan tipenya dengan parameter fungsi
+    SinglyLinkedListNode* kurakura = llist; 
+    
+    while (kurakura != nullptr && kurakura->next != nullptr) {    
+        SinglyLinkedListNode* temp = kurakura->next;
+        
+        if (kurakura->data == temp->data) {
+            kurakura->next = kurakura->next->next;
+            delete temp;
+        } else {
+            kurakura = kurakura->next; 
+        }
+    } 
+    
+    return llist;
+}
